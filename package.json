@@ -1,0 +1,22 @@
+{
+  "name": "nest-101",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "apps/**",
+    "libs/**"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sergiorodrigalvarez-facephi/nest-101.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sergiorodrigalvarez-facephi/nest-101/issues"
+  },
+  "homepage": "https://github.com/sergiorodrigalvarez-facephi/nest-101#readme"
+}

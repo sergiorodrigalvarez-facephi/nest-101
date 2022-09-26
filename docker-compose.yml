@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  postgresql:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - mypostgres:/var/mypostgres
+    environment:
+      - POSTGRES_PASSWORD=password
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    ports:
+      - 7000:8978
+    depends_on:
+      - postgresql
+volumes:
+  mypostgres:
