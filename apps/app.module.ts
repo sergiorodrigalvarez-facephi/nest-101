@@ -7,13 +7,15 @@ import { TransactionService } from './src/transactions/transaction.service';
 import { ConsumerService } from './src/consumer/consumer.service';
 import { ProducerController } from './src/producer/producer.controller';
 import { ProducerService } from './src/producer/producer.service';
-import { TRANSACTION_PORT, EVENT_PORT } from '../libs/src/db/interfaces';
+import { TRANSACTION_PORT, EVENT_PORT } from '../libs/src/db';
 import { TransactionAdapter, EventAdapter } from '../libs/src/db/postgres';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    ConfigModule.forRoot()
+    ConfigModule.forRoot({
+      envFilePath: '../.env'
+    })
   ],
   controllers: [
     TransactionController, 

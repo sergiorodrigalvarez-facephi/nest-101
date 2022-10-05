@@ -5,9 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import {
   EventPort,
   EVENT_PORT,
+  GetEventStatus,
   TransactionPort,
   TRANSACTION_PORT,
-} from '../../../libs/src/db/interfaces';
+} from '../../../libs/src/db';
 
 @Injectable()
 export class ConsumerService {
@@ -34,9 +35,16 @@ export class ConsumerService {
   }
 
   private async fetchEventBatch() {
-    const events = await this.eventPort.getEventBatch({
+    const eventBatch = await this.eventPort.getEventBatch({
       amount: this.batch_size,
     });
+
+    if (eventBatch.status === GetEventStatus.GENERIC_ERROR) {
+      console.error(`There was an error fetching events`);
+      return;
+    }
+
+    const events = eventBatch.events;
 
     console.log(`${events.length} event/s fetched`);
 

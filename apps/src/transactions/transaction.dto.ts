@@ -7,8 +7,14 @@ export class TransactionDto {
   customId: string;
 }
 
+export enum CreateTransactionStatus {
+  OK,
+  PROPAGABLE_ERROR,
+  NON_PROPAGABLE_ERROR,
+}
+
 export interface CreateTransactionResult {
-  ok: boolean;
+  status: CreateTransactionStatus;
   uuid?: string;
   errorMessage?: string;
 }

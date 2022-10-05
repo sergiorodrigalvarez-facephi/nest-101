@@ -1,10 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { CreateTransactionResult, TransactionDto } from './transaction.dto';
+import {
+  CreateTransactionResult,
+  TransactionDto,
+  CreateTransactionStatus as ServiceCreateTransactionStatus,
+} from './transaction.dto';
 import {
   TransactionPort,
   TRANSACTION_PORT,
-} from '../../../libs/src/db/interfaces';
+  CreateTransactionStatus as DbCreateTransactionStatus,
+} from '../../../libs/src/db';
 
 @Injectable()
 export class TransactionService {
@@ -15,6 +20,21 @@ export class TransactionService {
   async createTransaction(
     transactionDto: TransactionDto,
   ): Promise<CreateTransactionResult> {
-    return this.transactionPort.createTransaction(transactionDto);
+    const result = await this.transactionPort.createTransaction(transactionDto);
+    if (result.status === DbCreateTransactionStatus.OK) {
+      return {
+        status: ServiceCreateTransactionStatus.OK,
+        uuid: result.uuid,
+      };
+    }
+    if (result.status === DbCreateTransactionStatus.UNIQUE_VIOLATION) {
+      return {
+        status: ServiceCreateTransactionStatus.PROPAGABLE_ERROR,
+        errorMessage: result.errorMessage,
+      };
+    }
+    return {
+      status: ServiceCreateTransactionStatus.NON_PROPAGABLE_ERROR,
+    };
   }
 }

@@ -2,17 +2,22 @@ import { Client, DatabaseError } from 'pg';
 import { Injectable } from '@nestjs/common';
 
 import {
+  TransactionPort,
+  CreateTransactionStatus,
   CreateTransactionQuery,
   CreateTransactionQueryResult,
-  TransactionPort,
+  UpdateTransactionStatus,
   UpdateTransactionStatusQuery,
   UpdateTransactionStatusQueryResult,
   UpdateTransactionStepQuery,
   UpdateTransactionStepQueryResult,
-} from '../interfaces';
+} from '..';
+
+const PG_UNIQUE_VIOLATION = '23505';
 
 @Injectable()
 export class TransactionAdapter implements TransactionPort {
+  // TODO: Make a load test and switch to Pool if performance is poor
   private client: Client;
 
   constructor() {
@@ -30,18 +35,22 @@ export class TransactionAdapter implements TransactionPort {
         [time, customId],
       );
       return {
-        ok: true,
+        status: CreateTransactionStatus.OK,
         uuid: result.rows[0].transactionid,
       };
     } catch (e) {
-      if (e instanceof DatabaseError && e.detail) {
-        return {
-          ok: false,
-          errorMessage: e.detail,
-        };
+      if (e instanceof DatabaseError) {
+        if (e.code === PG_UNIQUE_VIOLATION) {
+          return {
+            status: CreateTransactionStatus.UNIQUE_VIOLATION,
+            errorMessage: e.detail,
+          };
+        }
       }
       console.error(`createTransaction - ${e}`);
-      throw e;
+      return {
+        status: CreateTransactionStatus.GENERIC_ERROR,
+      };
     }
   }
 
@@ -50,16 +59,24 @@ export class TransactionAdapter implements TransactionPort {
   ): Promise<UpdateTransactionStatusQueryResult> {
     try {
       const { id, status } = updateTransactionStatusQuery;
-      await this.client.query(
+      const result = await this.client.query(
         'UPDATE transactions SET status = $1 WHERE transactionid = $2',
         [status, id],
       );
+      if (result.rowCount !== 1) {
+        return {
+          status: UpdateTransactionStatus.NO_UPDATE,
+          errorMessage: `Id: ${id}. Status: ${status}`,
+        };
+      }
       return {
-        ok: true,
+        status: UpdateTransactionStatus.OK,
       };
     } catch (e) {
       console.error(`updateTransactionStatus - ${e}`);
-      throw e;
+      return {
+        status: UpdateTransactionStatus.GENERIC_ERROR,
+      };
     }
   }
   async updateTransactionStep(
@@ -67,16 +84,24 @@ export class TransactionAdapter implements TransactionPort {
   ): Promise<UpdateTransactionStepQueryResult> {
     try {
       const { id, step } = updateTransactionStepQuery;
-      await this.client.query(
+      const result = await this.client.query(
         'UPDATE transactions SET step = $1 WHERE transactionid = $2',
         [step, id],
       );
+      if (result.rowCount !== 1) {
+        return {
+          status: UpdateTransactionStatus.NO_UPDATE,
+          errorMessage: `Id: ${id}. Step: ${step}`,
+        };
+      }
       return {
-        ok: true,
+        status: UpdateTransactionStatus.OK,
       };
     } catch (e) {
       console.error(`updateTransactionStep - ${e}`);
-      throw e;
+      return {
+        status: UpdateTransactionStatus.GENERIC_ERROR,
+      };
     }
   }
 

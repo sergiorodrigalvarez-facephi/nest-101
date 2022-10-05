@@ -1,10 +1,17 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 import { TransactionService } from './transaction.service';
 import {
   CreateTransactionResponse,
   CreateTransactionResult,
   TransactionDto,
+  CreateTransactionStatus,
 } from './transaction.dto';
 import { ValidationPipe } from '../../validation.pipe';
 
@@ -18,12 +25,12 @@ export class TransactionController {
   ): Promise<CreateTransactionResponse> {
     const result: CreateTransactionResult =
       await this.transactionService.createTransaction(request);
-    if (result.ok) {
-      return {
-        transactionId: result.uuid,
-      };
-    } else {
+    if (result.status === CreateTransactionStatus.OK) {
+      return;
+    }
+    if (result.status === CreateTransactionStatus.PROPAGABLE_ERROR) {
       throw new BadRequestException(result.errorMessage);
     }
+    throw new InternalServerErrorException();
   }
 }

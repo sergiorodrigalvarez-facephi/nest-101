@@ -1,14 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 
 import { AppModule } from '../app.module';
 
 import { SIMPLE_HAPPY_PATH, CONCURRENT_HAPPY_PATH } from './app.e2e-fixture';
 
-import { TRANSACTION_PORT, EVENT_PORT } from '../../libs/src/db/interfaces';
-
-jest.setTimeout(8000);
+import { TRANSACTION_PORT, EVENT_PORT } from '../../libs/src/db';
 
 async function sleep(timeInMs) {
   return new Promise((resolve) => {
@@ -18,10 +16,13 @@ async function sleep(timeInMs) {
   });
 }
 
+jest.setTimeout(8000);
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let server;
 
+  // TODO: Maybe it is a better idea to manually start the application with testing envs outside from the test
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -30,7 +31,6 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
     server = await app.getHttpServer();
-    await sleep(1000);
   });
 
   it('Simple happy path', async () => {
@@ -43,7 +43,7 @@ describe('AppController (e2e)', () => {
         customId: SIMPLE_HAPPY_PATH.customId,
       })
       .expect((res) => {
-        expect(res.statusCode).toBe(201);
+        expect(res.statusCode).toBe(HttpStatus.CREATED);
         expect(res.body.transactionId).not.toBe(undefined);
         transactionId = res.body.transactionId;
       });
@@ -70,7 +70,7 @@ describe('AppController (e2e)', () => {
           customId: transaction.customId,
         })
         .expect(async (res) => {
-          expect(res.statusCode).toBe(201);
+          expect(res.statusCode).toBe(HttpStatus.CREATED);
           expect(res.body.transactionId).not.toBe(undefined);
           const transactionId = res.body.transactionId;
 
@@ -84,7 +84,7 @@ describe('AppController (e2e)', () => {
                 data: event.data,
               })
               .expect((res) => {
-                expect(res.statusCode).toBe(201);
+                expect(res.statusCode).toBe(HttpStatus.CREATED);
               });
           }
         });

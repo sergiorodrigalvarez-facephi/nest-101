@@ -2,11 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  InternalServerErrorException,
   Post,
   ValidationPipe,
 } from '@nestjs/common';
 
-import { CreateEventResult, EventDto } from './producer.dto';
+import { CreateEventResult, EventDto, CreateEventStatus } from './producer.dto';
 import { ProducerService } from './producer.service';
 
 @Controller('event')
@@ -18,10 +19,12 @@ export class ProducerController {
     const result: CreateEventResult = await this.producerService.createEvent(
       request,
     );
-    if (result.ok) {
+    if (result.status === CreateEventStatus.OK) {
       return;
-    } else {
+    }
+    if (result.status === CreateEventStatus.PROPAGABLE_ERROR) {
       throw new BadRequestException(result.errorMessage);
     }
+    throw new InternalServerErrorException();
   }
 }

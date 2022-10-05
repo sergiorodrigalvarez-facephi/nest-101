@@ -11,7 +11,13 @@ export class EventDto {
   data: Record<string, unknown>;
 }
 
+export enum CreateEventStatus {
+  OK,
+  PROPAGABLE_ERROR,
+  NON_PROPAGABLE_ERROR,
+}
+
 export interface CreateEventResult {
-  ok: boolean;
+  status: CreateEventStatus;
   errorMessage?: string;
 }

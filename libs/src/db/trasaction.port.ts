@@ -1,6 +1,17 @@
-interface UpsertResult {
-  ok: boolean;
+interface CommonResult {
   errorMessage?: string;
+}
+
+export enum CreateTransactionStatus {
+  OK,
+  UNIQUE_VIOLATION,
+  GENERIC_ERROR,
+}
+
+export enum UpdateTransactionStatus {
+  OK,
+  NO_UPDATE,
+  GENERIC_ERROR,
 }
 
 export interface CreateTransactionQuery {
@@ -8,7 +19,8 @@ export interface CreateTransactionQuery {
   customId: string;
 }
 
-export interface CreateTransactionQueryResult extends UpsertResult {
+export interface CreateTransactionQueryResult extends CommonResult {
+  status: CreateTransactionStatus;
   uuid?: string;
 }
 
@@ -17,14 +29,18 @@ export interface UpdateTransactionStatusQuery {
   status: string;
 }
 
-export type UpdateTransactionStatusQueryResult = UpsertResult;
+export interface UpdateTransactionStatusQueryResult extends CommonResult {
+  status: UpdateTransactionStatus;
+}
 
 export interface UpdateTransactionStepQuery {
   id: string;
   step: string;
 }
 
-export type UpdateTransactionStepQueryResult = UpsertResult;
+export interface UpdateTransactionStepQueryResult extends CommonResult {
+  status: UpdateTransactionStatus;
+}
 
 export interface TransactionPort {
   createTransaction(
