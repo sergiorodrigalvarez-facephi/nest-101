@@ -10,7 +10,7 @@ export interface GetSchemaQuery {
 
 export interface GetSchemaQueryResult {
   status: GetSchemaStatus;
-  schemaRegistry?: object;
+  schemaRegistry?: Record<string, unknown>;
 }
 
 export interface SchemaRegistryPort {

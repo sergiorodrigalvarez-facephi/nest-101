@@ -49,15 +49,7 @@
                 "CANCELLED"
             ],
             "default": "CREATED"
-        },
-        "phoneNumber": {
-            "type": "string",
-            "default": ""
-        },
-        "location": {
-            "type": "string",
-            "default": ""
         }
     },
-    "required": ["steps", "step", "status", "phoneNumber", "location"]
+    "required": ["steps", "step", "status"]
 }

@@ -1,0 +1,15 @@
+{
+    "title": "transaction1Event1",
+    "type": "object",
+    "properties": {
+        "step": {
+            "type": "string",
+            "enum": [
+                "widget1",
+                "widget2",
+                "widget3"
+            ]
+        }
+    },
+    "required": ["step"]
+}

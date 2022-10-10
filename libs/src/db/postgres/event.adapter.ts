@@ -55,7 +55,7 @@ export class EventAdapter implements EventPort {
           };
         }
       }
-      console.error(`createEvent - ${e}`);
+      console.error(`createEvent - ${e.stack}`);
       return {
         status: CreateEventStatus.GENERIC_ERROR,
       };
@@ -82,7 +82,7 @@ export class EventAdapter implements EventPort {
         events: [],
       };
     } catch (e) {
-      console.error(`getEventBatch - ${e}`);
+      console.error(`getEventBatch - ${e.stack}`);
       return {
         status: GetEventStatus.GENERIC_ERROR,
       };
@@ -119,7 +119,7 @@ export class EventAdapter implements EventPort {
         status: UpdateProcessedEventsStatus.OK,
       };
     } catch (e) {
-      console.error(`updateProcessedEvents - ${e}`);
+      console.error(`updateProcessedEvents - ${e.stack}`);
       return {
         status: UpdateProcessedEventsStatus.GENERIC_ERROR,
       };

@@ -3,9 +3,7 @@ create table transactions (
     time timestamp not null, 
     customid varchar unique not null,
     flowid varchar not null,
-    data jsonb not null,
-    status varchar default 'CREATED',
-    step varchar
+    data jsonb not null
 );
 
 create table events (

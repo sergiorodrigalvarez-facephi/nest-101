@@ -70,7 +70,7 @@ export class TransactionService {
 
     const transactionSkeleton = jsf.generate(
       getSchemaResult.schemaRegistry,
-    ) as object;
+    ) as Record<string, unknown>;
 
     const result = await this.transactionPort.createTransaction({
       flowId: transactionDto.flowId,

@@ -10,6 +10,7 @@ import {
   TransactionPort,
   TRANSACTION_PORT,
 } from '../../../libs/src/db';
+import { GetReducerStatus, ReducerMapper } from 'src/reduction/reducer.mapper';
 
 @Injectable()
 export class ConsumerService {
@@ -22,6 +23,7 @@ export class ConsumerService {
   constructor(
     private scheduler: SchedulerRegistry,
     private config: ConfigService,
+    private reducerMapper: ReducerMapper,
     @Inject(EVENT_PORT) private eventPort: EventPort,
     @Inject(TRANSACTION_PORT) private transactionPort: TransactionPort,
   ) {
@@ -57,9 +59,6 @@ export class ConsumerService {
     }, []);
 
     for (const transactionId of uniqueTransactionIds) {
-      const transactionEvents = events.filter(
-        (event) => event.transactionId === transactionId,
-      );
       const getTransactionResult = await this.transactionPort.getTransaction({
         id: transactionId,
       });
@@ -73,10 +72,38 @@ export class ConsumerService {
         continue;
       }
 
-      // TODO: Redux reduction here
-      /*for (const transactionEvent of transactionEvents) {
-        const data = transactionEvent.data;
-      }*/
+      const transactionEvents = events.filter(
+        (event) => event.transactionId === transactionId,
+      );
+
+      const transaction = getTransactionResult.transaction;
+      let transactionData = transaction.data;
+
+      for (const transactionEvent of transactionEvents) {
+        const getReducerQueryResult = this.reducerMapper.getReducer({
+          id: transactionEvent.type,
+        });
+
+        if (getReducerQueryResult.status === GetReducerStatus.NOT_FOUND) {
+          console.error(`reducer not found. Id: ${transactionEvent.type}`);
+          continue;
+        }
+
+        if (getReducerQueryResult.status === GetReducerStatus.GENERIC_ERROR) {
+          continue;
+        }
+
+        const reducer = getReducerQueryResult.reducer;
+
+        const eventData = transactionEvent.data;
+        transactionData = reducer(eventData, transactionData);
+      }
+
+      this.transactionPort.updateTransaction({
+        id: transaction.transactionId,
+        data: transactionData,
+      });
+
       await this.eventPort.updateProcessedEvents({
         ids: transactionEvents.map((event) => event.eventId),
       });

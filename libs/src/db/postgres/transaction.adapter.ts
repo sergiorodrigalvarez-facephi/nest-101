@@ -51,7 +51,7 @@ export class TransactionAdapter implements TransactionPort {
           };
         }
       }
-      console.error(`createTransaction - ${e}`);
+      console.error(`createTransaction - ${e.stack}`);
       return {
         status: CreateTransactionStatus.GENERIC_ERROR,
       };
@@ -79,7 +79,7 @@ export class TransactionAdapter implements TransactionPort {
         transaction: null,
       };
     } catch (e) {
-      console.error(`getTransaction - ${e}`);
+      console.error(`getTransaction - ${e.stack}`);
       return {
         status: GetTransactionStatus.GENERIC_ERROR,
       };
@@ -91,8 +91,6 @@ export class TransactionAdapter implements TransactionPort {
       customId: row.customid,
       data: row.data,
       flowId: row.flowid,
-      status: row.status,
-      step: row.step,
       time: row.time,
       transactionId: row.transactionid,
     };
@@ -102,32 +100,18 @@ export class TransactionAdapter implements TransactionPort {
     updateTransactionQuery: UpdateTransactionQuery,
   ): Promise<UpdateTransactionQueryResult> {
     try {
-      const { id, data, status, step } = updateTransactionQuery;
+      const { id, data } = updateTransactionQuery;
 
-      if (data) {
-        await this.client.query(
-          'UPDATE transactions SET data = $1 WHERE transactionid = $2',
-          [data, id],
-        );
-      }
-      if (status) {
-        await this.client.query(
-          'UPDATE transactions SET status = $1 WHERE transactionid = $2',
-          [status, id],
-        );
-      }
-      if (step) {
-        await this.client.query(
-          'UPDATE transactions SET step = $1 WHERE transactionid = $2',
-          [step, id],
-        );
-      }
+      await this.client.query(
+        'UPDATE transactions SET data = $1 WHERE transactionid = $2',
+        [data, id],
+      );
 
       return {
         status: UpdateTransactionStatus.OK,
       };
     } catch (e) {
-      console.error(`updateTransactionStatus - ${e}`);
+      console.error(`updateTransactionStatus - ${e.stack}`);
       return {
         status: UpdateTransactionStatus.GENERIC_ERROR,
       };

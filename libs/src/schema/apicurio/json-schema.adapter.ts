@@ -27,6 +27,18 @@ export class JsonSchemaAdapter implements JsonSchemaPort {
           status: ValidationStatus.OK,
         };
       }
+      // TODO: Mejorar la devolución de errores de AJV en caso de enumeración; los valores permitidos se ponen en una propiedad a parte.
+      /*
+      [
+        {
+          instancePath: '/step',
+          schemaPath: '#/properties/step/enum',
+          keyword: 'enum',
+          params: { allowedValues: [ 'widget1', 'widget2', 'widget3' ] },
+          message: 'must be equal to one of the allowed values'
+        }
+      ]
+      */
       return {
         status: ValidationStatus.VALIDATION_ERROR,
         validationErrors: validate.errors.map((error) => error.message),
@@ -38,7 +50,7 @@ export class JsonSchemaAdapter implements JsonSchemaPort {
           schemaError: e.message,
         };
       }
-      console.error(`validate - ${e}`);
+      console.error(`validate - ${e.stack}`);
       return {
         status: ValidationStatus.GENERIC_ERROR,
       };

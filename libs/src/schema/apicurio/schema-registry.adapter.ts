@@ -39,7 +39,7 @@ export class SchemaRegistryAdapter implements SchemaRegistryPort {
           status: GetSchemaStatus.NOT_FOUND,
         };
       }
-      console.error(`getSchema - ${e}`);
+      console.error(`getSchema - ${e.stack}`);
       return {
         status: GetSchemaStatus.GENERIC_ERROR,
       };

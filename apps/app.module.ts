@@ -11,6 +11,7 @@ import { TRANSACTION_PORT, EVENT_PORT } from '../libs/src/db';
 import { TransactionAdapter, EventAdapter } from '../libs/src/db/postgres';
 import { JSON_SCHEMA_PORT, SCHEMA_REGISTRY_PORT } from '../libs/src/schema';
 import { JsonSchemaAdapter, SchemaRegistryAdapter } from '../libs/src/schema/apicurio';
+import { ReducerMapper } from 'src/reduction/reducer.mapper';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { JsonSchemaAdapter, SchemaRegistryAdapter } from '../libs/src/schema/api
     {
       provide: SCHEMA_REGISTRY_PORT,
       useClass: SchemaRegistryAdapter
-    }
+    },
+    ReducerMapper
   ],
 })
 export class AppModule {}

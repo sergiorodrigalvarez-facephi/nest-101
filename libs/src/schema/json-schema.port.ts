@@ -6,7 +6,7 @@ export enum ValidationStatus {
 }
 
 export interface ValidationQuery {
-  schema: object;
+  schema: Record<string, unknown>;
   data: unknown;
 }
 

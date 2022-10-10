@@ -1,0 +1,16 @@
+{
+    "title": "transaction1Event2",
+    "type": "object",
+    "properties": {
+        "status": {
+            "type": "string",
+            "enum": [
+                "CREATED",
+                "SUCCEEDED",
+                "FAILED",
+                "CANCELLED"
+            ]
+        }
+    },
+    "required": ["status"]
+}

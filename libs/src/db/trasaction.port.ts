@@ -24,16 +24,14 @@ export interface Transaction {
   time: Date;
   customId: string;
   flowId: string;
-  data: object;
-  status: string;
-  step: string;
+  data: Record<string, unknown>;
 }
 
 export interface CreateTransactionQuery {
   time: Date;
   customId: string;
   flowId: string;
-  data: object;
+  data: Record<string, unknown>;
 }
 
 export interface CreateTransactionQueryResult extends CommonResult {
@@ -52,9 +50,7 @@ export interface GetTransactionQueryResult {
 
 export interface UpdateTransactionQuery {
   id: string;
-  data?: object;
-  status?: string;
-  step?: string;
+  data: Record<string, unknown>;
 }
 
 export interface UpdateTransactionQueryResult extends CommonResult {
