@@ -1,0 +1,70 @@
+{
+    "title": "transaction1",
+    "type": "object",
+    "properties": {
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "step": {
+                        "type": "string",
+                        "enum": [
+                            "widget1",
+                            "widget2",
+                            "widget3"
+                        ]
+                    }
+                },
+                "required": ["order", "step"]
+            },
+            "default": [
+                {
+                    "order": 0,
+                    "step": "widget2"
+                },
+                {
+                    "order": 1,
+                    "step": "widget3"
+                },
+                {
+                    "order": 2,
+                    "step": "widget1"
+                }
+            ]
+        },
+        "step": {
+            "type": "string",
+            "enum": [
+                "widget1",
+                "widget2",
+                "widget3"
+            ],
+            "default": ""
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "CREATED",
+                "SUCCEEDED",
+                "FAILED",
+                "CANCELLED"
+            ],
+            "default": "CREATED"
+        },
+        "device": {
+            "type": "string",
+            "default": ""
+        },
+        "onboardingTime": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+        }
+    },
+    "required": ["steps", "step", "status", "device", "onboardingTime"]
+}

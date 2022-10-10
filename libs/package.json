@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "@nestjs/common": "^9.1.2",
-    "pg": "^8.8.0"
+    "ajv": "^8.11.0",
+    "pg": "^8.8.0",
+    "superagent": "^8.0.2"
   },
   "devDependencies": {
     "@types/pg": "^8.6.5"

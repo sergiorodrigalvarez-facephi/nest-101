@@ -8,15 +8,32 @@ export enum CreateTransactionStatus {
   GENERIC_ERROR,
 }
 
+export enum GetTransactionStatus {
+  OK,
+  EMPTY_RESULT,
+  GENERIC_ERROR,
+}
+
 export enum UpdateTransactionStatus {
   OK,
-  NO_UPDATE,
   GENERIC_ERROR,
+}
+
+export interface Transaction {
+  transactionId: string;
+  time: Date;
+  customId: string;
+  flowId: string;
+  data: object;
+  status: string;
+  step: string;
 }
 
 export interface CreateTransactionQuery {
   time: Date;
   customId: string;
+  flowId: string;
+  data: object;
 }
 
 export interface CreateTransactionQueryResult extends CommonResult {
@@ -24,21 +41,23 @@ export interface CreateTransactionQueryResult extends CommonResult {
   uuid?: string;
 }
 
-export interface UpdateTransactionStatusQuery {
+export interface GetTransactionQuery {
   id: string;
-  status: string;
 }
 
-export interface UpdateTransactionStatusQueryResult extends CommonResult {
-  status: UpdateTransactionStatus;
+export interface GetTransactionQueryResult {
+  status: GetTransactionStatus;
+  transaction?: Transaction;
 }
 
-export interface UpdateTransactionStepQuery {
+export interface UpdateTransactionQuery {
   id: string;
-  step: string;
+  data?: object;
+  status?: string;
+  step?: string;
 }
 
-export interface UpdateTransactionStepQueryResult extends CommonResult {
+export interface UpdateTransactionQueryResult extends CommonResult {
   status: UpdateTransactionStatus;
 }
 
@@ -47,13 +66,13 @@ export interface TransactionPort {
     createTransactionQuery: CreateTransactionQuery,
   ): Promise<CreateTransactionQueryResult>;
 
-  updateTransactionStatus(
-    updateTransactionStatusQuery: UpdateTransactionStatusQuery,
-  ): Promise<UpdateTransactionStatusQueryResult>;
+  getTransaction(
+    getTransaction: GetTransactionQuery,
+  ): Promise<GetTransactionQueryResult>;
 
-  updateTransactionStep(
-    updateTransactionStepQuery: UpdateTransactionStepQuery,
-  ): Promise<UpdateTransactionStepQueryResult>;
+  updateTransaction(
+    updateTransactionQuery: UpdateTransactionQuery,
+  ): Promise<UpdateTransactionQueryResult>;
 
   close(): Promise<void>;
 }

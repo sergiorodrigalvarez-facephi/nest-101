@@ -14,5 +14,15 @@ services:
       - 7000:8978
     depends_on:
       - postgresql
+  apicurio:
+    image: apicurio/apicurio-registry-sql:latest-snapshot
+    ports: 
+      - 9000:8080
+    depends_on:
+      - postgresql
+    environment:
+      - REGISTRY_DATASOURCE_URL=${PGURL}
+      - REGISTRY_DATASOURCE_USERNAME=${PGUSER}
+      - REGISTRY_DATASOURCE_PASSWORD=${PGPASSWORD}
 volumes:
   mypostgres:

@@ -9,6 +9,8 @@ import { ProducerController } from './src/producer/producer.controller';
 import { ProducerService } from './src/producer/producer.service';
 import { TRANSACTION_PORT, EVENT_PORT } from '../libs/src/db';
 import { TransactionAdapter, EventAdapter } from '../libs/src/db/postgres';
+import { JSON_SCHEMA_PORT, SCHEMA_REGISTRY_PORT } from '../libs/src/schema';
+import { JsonSchemaAdapter, SchemaRegistryAdapter } from '../libs/src/schema/apicurio';
 
 @Module({
   imports: [
@@ -32,6 +34,14 @@ import { TransactionAdapter, EventAdapter } from '../libs/src/db/postgres';
     {
       provide: EVENT_PORT,
       useClass: EventAdapter
+    },
+    {
+      provide: JSON_SCHEMA_PORT,
+      useClass: JsonSchemaAdapter
+    },
+    {
+      provide: SCHEMA_REGISTRY_PORT,
+      useClass: SchemaRegistryAdapter
     }
   ],
 })

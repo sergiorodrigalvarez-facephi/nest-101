@@ -71,7 +71,7 @@ export class EventAdapter implements EventPort {
         'SELECT * FROM events WHERE processed = false LIMIT $1',
         [amount],
       );
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         return {
           status: GetEventStatus.OK,
           events: this.getEventBatchMapper(result.rows),

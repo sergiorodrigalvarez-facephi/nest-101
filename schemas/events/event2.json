@@ -1,0 +1,32 @@
+{
+    "title": "event2",
+    "type": "object",
+    "properties": {
+        "step": {
+            "type": "string",
+            "enum": [
+                "widget1",
+                "widget2"
+            ]
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "CREATED",
+                "SUCCEEDED",
+                "FAILED",
+                "CANCELLED"
+            ]
+        },
+        "phoneNumber": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        }
+    },
+    "oneOf": [
+        { "required": ["step"] },
+        { "required": ["status"] }
+    ]
+}

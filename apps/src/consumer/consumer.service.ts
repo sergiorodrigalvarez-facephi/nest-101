@@ -6,6 +6,7 @@ import {
   EventPort,
   EVENT_PORT,
   GetEventStatus,
+  GetTransactionStatus,
   TransactionPort,
   TRANSACTION_PORT,
 } from '../../../libs/src/db';
@@ -59,23 +60,23 @@ export class ConsumerService {
       const transactionEvents = events.filter(
         (event) => event.transactionId === transactionId,
       );
-      //.sort((a, b) => a.time.getTime()-b.time.getTime());
-      for (const transactionEvent of transactionEvents) {
-        const { status, step } = transactionEvent.data as any;
+      const getTransactionResult = await this.transactionPort.getTransaction({
+        id: transactionId,
+      });
 
-        if (status) {
-          await this.transactionPort.updateTransactionStatus({
-            id: transactionId,
-            status,
-          });
-        }
-        if (step) {
-          await this.transactionPort.updateTransactionStep({
-            id: transactionId,
-            step,
-          });
-        }
+      if (getTransactionResult.status === GetTransactionStatus.EMPTY_RESULT) {
+        console.error(`Transaction not found. Id: ${transactionId}`);
+        continue;
       }
+
+      if (getTransactionResult.status === GetTransactionStatus.GENERIC_ERROR) {
+        continue;
+      }
+
+      // TODO: Redux reduction here
+      /*for (const transactionEvent of transactionEvents) {
+        const data = transactionEvent.data;
+      }*/
       await this.eventPort.updateProcessedEvents({
         ids: transactionEvents.map((event) => event.eventId),
       });

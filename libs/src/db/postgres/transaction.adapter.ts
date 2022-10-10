@@ -7,11 +7,15 @@ import {
   CreateTransactionQuery,
   CreateTransactionQueryResult,
   UpdateTransactionStatus,
-  UpdateTransactionStatusQuery,
-  UpdateTransactionStatusQueryResult,
-  UpdateTransactionStepQuery,
-  UpdateTransactionStepQueryResult,
+  UpdateTransactionQuery,
+  UpdateTransactionQueryResult,
 } from '..';
+import {
+  GetTransactionQuery,
+  GetTransactionQueryResult,
+  GetTransactionStatus,
+  Transaction,
+} from '../trasaction.port';
 
 const PG_UNIQUE_VIOLATION = '23505';
 
@@ -29,10 +33,10 @@ export class TransactionAdapter implements TransactionPort {
     createTransactionQuery: CreateTransactionQuery,
   ): Promise<CreateTransactionQueryResult> {
     try {
-      const { time, customId } = createTransactionQuery;
+      const { flowId, time, customId, data } = createTransactionQuery;
       const result = await this.client.query(
-        `INSERT INTO transactions (time, customId) VALUES ($1, $2) RETURNING transactionId`,
-        [time, customId],
+        `INSERT INTO transactions (flowId, time, customId, data) VALUES ($1, $2, $3, $4) RETURNING transactionId`,
+        [flowId, time, customId, data],
       );
       return {
         status: CreateTransactionStatus.OK,
@@ -54,51 +58,76 @@ export class TransactionAdapter implements TransactionPort {
     }
   }
 
-  async updateTransactionStatus(
-    updateTransactionStatusQuery: UpdateTransactionStatusQuery,
-  ): Promise<UpdateTransactionStatusQueryResult> {
+  async getTransaction(
+    getTransaction: GetTransactionQuery,
+  ): Promise<GetTransactionQueryResult> {
     try {
-      const { id, status } = updateTransactionStatusQuery;
+      const { id } = getTransaction;
+
       const result = await this.client.query(
-        'UPDATE transactions SET status = $1 WHERE transactionid = $2',
-        [status, id],
+        'SELECT * FROM transactions WHERE transactionid = $1',
+        [id],
       );
-      if (result.rowCount !== 1) {
+      if (result.rows && result.rows.length > 0) {
         return {
-          status: UpdateTransactionStatus.NO_UPDATE,
-          errorMessage: `Id: ${id}. Status: ${status}`,
+          status: GetTransactionStatus.OK,
+          transaction: this.getTransactionMapper(result.rows[0]),
         };
       }
+      return {
+        status: GetTransactionStatus.EMPTY_RESULT,
+        transaction: null,
+      };
+    } catch (e) {
+      console.error(`getTransaction - ${e}`);
+      return {
+        status: GetTransactionStatus.GENERIC_ERROR,
+      };
+    }
+  }
+
+  private getTransactionMapper(row: any): Transaction {
+    return {
+      customId: row.customid,
+      data: row.data,
+      flowId: row.flowid,
+      status: row.status,
+      step: row.step,
+      time: row.time,
+      transactionId: row.transactionid,
+    };
+  }
+
+  async updateTransaction(
+    updateTransactionQuery: UpdateTransactionQuery,
+  ): Promise<UpdateTransactionQueryResult> {
+    try {
+      const { id, data, status, step } = updateTransactionQuery;
+
+      if (data) {
+        await this.client.query(
+          'UPDATE transactions SET data = $1 WHERE transactionid = $2',
+          [data, id],
+        );
+      }
+      if (status) {
+        await this.client.query(
+          'UPDATE transactions SET status = $1 WHERE transactionid = $2',
+          [status, id],
+        );
+      }
+      if (step) {
+        await this.client.query(
+          'UPDATE transactions SET step = $1 WHERE transactionid = $2',
+          [step, id],
+        );
+      }
+
       return {
         status: UpdateTransactionStatus.OK,
       };
     } catch (e) {
       console.error(`updateTransactionStatus - ${e}`);
-      return {
-        status: UpdateTransactionStatus.GENERIC_ERROR,
-      };
-    }
-  }
-  async updateTransactionStep(
-    updateTransactionStepQuery: UpdateTransactionStepQuery,
-  ): Promise<UpdateTransactionStepQueryResult> {
-    try {
-      const { id, step } = updateTransactionStepQuery;
-      const result = await this.client.query(
-        'UPDATE transactions SET step = $1 WHERE transactionid = $2',
-        [step, id],
-      );
-      if (result.rowCount !== 1) {
-        return {
-          status: UpdateTransactionStatus.NO_UPDATE,
-          errorMessage: `Id: ${id}. Step: ${step}`,
-        };
-      }
-      return {
-        status: UpdateTransactionStatus.OK,
-      };
-    } catch (e) {
-      console.error(`updateTransactionStep - ${e}`);
       return {
         status: UpdateTransactionStatus.GENERIC_ERROR,
       };

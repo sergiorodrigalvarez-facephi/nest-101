@@ -1,0 +1,63 @@
+{
+    "title": "transaction2",
+    "type": "object",
+    "properties": {
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "step": {
+                        "type": "string",
+                        "enum": [
+                            "widget1",
+                            "widget2"
+                        ]
+                    }
+                },
+                "required": ["order", "step"]
+            },
+            "default": [
+                {
+                    "order": 0,
+                    "step": "widget1"
+                },
+                {
+                    "order": 1,
+                    "step": "widget2"
+                }
+            ]
+        },
+        "step": {
+            "type": "string",
+            "enum": [
+                "widget1",
+                "widget2"
+            ],
+            "default": ""
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "CREATED",
+                "SUCCEEDED",
+                "FAILED",
+                "CANCELLED"
+            ],
+            "default": "CREATED"
+        },
+        "phoneNumber": {
+            "type": "string",
+            "default": ""
+        },
+        "location": {
+            "type": "string",
+            "default": ""
+        }
+    },
+    "required": ["steps", "step", "status", "phoneNumber", "location"]
+}
